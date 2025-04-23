@@ -8,6 +8,16 @@ local w, h = client.screen_size()
 local js = panorama.open()
 local alpha = 69
 local toggled = false
+
+local stats = {
+    total_loads = 0,
+    total_killed = 0
+}
+
+stats.total_loads = database.read("cidesense_stats_total_loads") or 0
+stats.total_killed = database.read("cidesense_stats_total_killed") or 0
+
+
 client.set_event_callback("paint_ui", function()
 	if alpha > 0 and toggled then
 		if alpha == 169 then
@@ -70,7 +80,7 @@ return (function(tbl)
             return output
         end
     }
-    local category = ui.new_combobox("aa", "anti-aimbot angles", prefix("category" .. rgba(69,169,155,255," " .. (getbuild() == "beta" and " (beta)" or ""))), {"anti aimbot", "visuals & misc", "config"})
+    local category = ui.new_combobox("aa", "anti-aimbot angles", prefix("category" .. rgba(69,169,155,255," " .. (getbuild() == "beta" and " (beta)" or ""))), {"anti aimbot", "visuals & misc", "statistics", "other"})
     local aa = {}
     local menu = {}
 	local notifications = {}
@@ -108,6 +118,14 @@ return (function(tbl)
 			return t
 		end
 	}
+	
+	client.set_event_callback("player_death", function(e)
+		local attacker = client.userid_to_entindex(e.attacker)
+		local local_player = entity.get_local_player()
+		if attacker == local_player then
+			stats.total_killed = stats.total_killed + 1
+		end
+	end)
 	draw_gamesense_ui.border = function(x, y, width, height, alpha)
 		local x = x - 7 - 1
 		local y = y - 7 - 5
@@ -177,128 +195,138 @@ return (function(tbl)
 			end
 		end
 	end)
-    menu = {
-        ["anti aimbot"] = {
-            submenu = ui.new_combobox("aa", "anti-aimbot angles", "\nmenu", {"builder", "keybinds", "features"}),
-            ["builder"] = {
-                builder = ui.new_combobox("aa", "anti-aimbot angles", prefix("builder"), tbl.states),
-                team = ui.new_combobox("aa", "anti-aimbot angles", "\nteam", {"ct", "t"})
-            },
-            ["keybinds"] = {
-                keys = ui.new_multiselect("aa", "anti-aimbot angles", prefix("keys"), {"manual", "edge", "freestand"}),
-                left = ui.new_hotkey("aa", "anti-aimbot angles", prefix("left")),
-                right = ui.new_hotkey("aa", "anti-aimbot angles", prefix("right")),
-                forward = ui.new_hotkey("aa", "anti-aimbot angles", prefix("forward")),
-                backward = ui.new_hotkey("aa", "anti-aimbot angles", prefix("backward")),
-                type_manual = ui.new_combobox("aa", "anti-aimbot angles", prefix("manual"), {"default", "jitter", "static"}),
-                edge = ui.new_hotkey("aa", "anti-aimbot angles", prefix("edge")),
-                type_freestand = ui.new_combobox("aa", "anti-aimbot angles", prefix("freestand"), {"default", "jitter", "static"}),
-                freestand = ui.new_hotkey("aa", "anti-aimbot angles", "\nfreestand", true),
-                disablers = ui.new_multiselect("aa", "anti-aimbot angles", prefix("fs disablers"), {"air", "slow", "duck", "edge", "manual", "fake lag"})
-            },
-            ["features"] = {
-                legit = ui.new_combobox("aa", "anti-aimbot angles", prefix("legit"), {"off", "default", "cidesense"}),
-                fix = ui.new_multiselect("aa", "anti-aimbot angles", "\nfix", {"generic", "bombsite"}),
+	menu = {
+		["anti aimbot"] = {
+			submenu = ui.new_combobox("aa", "anti-aimbot angles", "\nmenu", {"builder", "keybinds", "features", "statistics", "other"}),
+			["builder"] = {
+				builder = ui.new_combobox("aa", "anti-aimbot angles", prefix("builder"), tbl.states),
+				team = ui.new_combobox("aa", "anti-aimbot angles", "\nteam", {"ct", "t"})
+			},
+			["keybinds"] = {
+				keys = ui.new_multiselect("aa", "anti-aimbot angles", prefix("keys"), {"manual", "edge", "freestand"}),
+				left = ui.new_hotkey("aa", "anti-aimbot angles", prefix("left")),
+				right = ui.new_hotkey("aa", "anti-aimbot angles", prefix("right")),
+				forward = ui.new_hotkey("aa", "anti-aimbot angles", prefix("forward")),
+				backward = ui.new_hotkey("aa", "anti-aimbot angles", prefix("backward")),
+				type_manual = ui.new_combobox("aa", "anti-aimbot angles", prefix("manual"), {"default", "jitter", "static"}),
+				edge = ui.new_hotkey("aa", "anti-aimbot angles", prefix("edge")),
+				type_freestand = ui.new_combobox("aa", "anti-aimbot angles", prefix("freestand"), {"default", "jitter", "static"}),
+				freestand = ui.new_hotkey("aa", "anti-aimbot angles", "\nfreestand", true),
+				disablers = ui.new_multiselect("aa", "anti-aimbot angles", prefix("fs disablers"), {"air", "slow", "duck", "edge", "manual"})
+			},
+			["features"] = {
+				legit = ui.new_combobox("aa", "anti-aimbot angles", prefix("legit"), {"off", "default", "cidesense"}),
+				fix = ui.new_multiselect("aa", "anti-aimbot angles", "\nfix", {"generic", "bombsite"}),
 				defensive = ui.new_combobox("aa", "anti-aimbot angles", prefix("defensive"), {"off", "pitch", "spin", "random", "random pitch", "sideways down", "sideways up"}),
-                fixer = ui.new_combobox("aa", "anti-aimbot angles", "\nfixer", {"default", "cidesense"}),
+				fixer = ui.new_combobox("aa", "anti-aimbot angles", "\nfixer", {"default", "cidesense"}),
 				states = ui.new_multiselect("aa", "anti-aimbot angles", "\nstates\n", {"standing", "moving", "air", "air duck", "duck", "duck moving", "slow motion"}),
-                backstab = ui.new_combobox("aa", "anti-aimbot angles", prefix("backstab"), {"off", "forward", "random"}),
-                distance = ui.new_slider("aa", "anti-aimbot angles", "\nbackstab", 100, 500, 250),
-                roll = ui.new_slider("aa", "anti-aimbot angles", prefix("roll"), -45, 45, 0)
-            },
-        },
-        ["visuals & misc"] = {
-            submenu = ui.new_combobox("aa", "anti-aimbot angles", "\nvisuals & misc", {"visuals", "misc"}),
-            ["visuals"] = {
-                watermark = ui.new_combobox("aa", "anti-aimbot angles", prefix("always on", "watermark"), {"bottom", "right", "left"}),
-                watermark_color = ui.new_color_picker("aa", "anti-aimbot angles", "\nwatermark", 150, 200, 69, 255),
-                watermark_spaces = ui.new_combobox("aa", "anti-aimbot angles", prefix("remove spaces"), {"yes", "no"}),
-                notify = ui.new_multiselect("aa", "anti-aimbot angles", prefix("notify"), {"hit", "miss", "shot", "reset", "old"}),
-                arrows = ui.new_combobox("aa", "anti-aimbot angles", prefix("arrows"), {"-", "simple", "body", "cidesense"}),
-                arrows_color = ui.new_color_picker("aa", "anti-aimbot angles", "\narrows", 137, 245, 150, 255),
-                indicators = ui.new_combobox("aa", "anti-aimbot angles", prefix("indicators"), {"-", "default"}),
-                indicators_color = ui.new_color_picker("aa", "anti-aimbot angles", "\nindicators", 137, 245, 150, 255),
-            },
-            ["misc"] = {
-                features = ui.new_multiselect("aa", "anti-aimbot angles", prefix("features"), {"fix hideshot", "animations", "legs spammer"}),
-                spammer = ui.new_slider("aa", "anti-aimbot angles", "\nspammer", 1, 9, 1),
-                autobuy = ui.new_combobox("aa", "anti-aimbot angles", prefix("auto buy"), {"off", "awp", "scout"})
-            }
-        },
-        ["config"] = {
-            export = ui.new_button("aa", "anti-aimbot angles", "\a89f596FF export", function()
-                local tbl = {}
-                for i, v in next, aa do
-                    tbl[i] = {}
-                    for index, value in next, v do
-                        tbl[i][index] = {}
-                        for ii, vv in next, value do
-                            if ii == "type" then
-                                tbl[i][index][ii] = ui.get(vv)
-                            else
-                                if ii ~= "button" then
-                                    tbl[i][index][ii] = {}
-                                    for iii, vvv in next, vv do
-                                        tbl[i][index][ii][iii] = ui.get(vvv)
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-                tbl["extra"] = {}
-                for i, v in next, menu["anti aimbot"] do
-                    if i == "submenu" then
-                        tbl["extra"][i] = ui.get(v)
-                    else
-                        tbl["extra"][i] = {}
-                        for index, value in next, v do
-                            local fixer = true
-                            if i == "keybinds" then
-                                if index == "left" or index == "right" or index == "forward" or index == "backward" or index == "edge" or index == "freestand" then
-                                    fixer = false
-                                end
-                            end
-                            if fixer then
-                                tbl["extra"][i][index] = ui.get(value)
-                            end
-                        end
-                    end
-                end
-				push_notify("Exported config!")
-                clipboard.export(json.stringify({["cidesense"] = tbl}))
-            end),
-            import = ui.new_button("aa", "anti-aimbot angles", "\a32a852FF import", function()
-                local check, message = pcall(function()
-                    local tbl = json.parse(clipboard.import())
-                    for i, v in next, tbl["cidesense"]["extra"] do
-                        if i == "submenu" then
-                            ui.set(menu["anti aimbot"][i], v)
-                        else
-                            for index, value in next, v do
-                                ui.set(menu["anti aimbot"][i][index], value)
-                            end
-                        end
-                    end
-                    tbl["cidesense"]["extra"] = nil
-                    for i, v in next, tbl["cidesense"] do
-                        for index, value in next, v do
-                            for ii, vv in next, value do
-                                if ii == "type" then
-                                    ui.set(aa[i][index][ii], vv)
-                                else
-                                    for iii, vvv in next, vv do
-                                        ui.set(aa[i][index][ii][iii], vvv)
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end)
-				push_notify(check and "Imported config!" or "Error while importing!")
-            end),
-        }
-    }
+				backstab = ui.new_combobox("aa", "anti-aimbot angles", prefix("backstab"), {"off", "forward", "random"}),
+				distance = ui.new_slider("aa", "anti-aimbot angles", "\nbackstab", 100, 500, 250),
+				roll = ui.new_slider("aa", "anti-aimbot angles", prefix("roll"), -45, 45, 0)
+			},
+			["statistics"] = {
+				total_loads_label = ui.new_label("aa", "anti-aimbot angles", "\aC8C8C8FFTotal loads: 0"),
+				total_killed_label = ui.new_label("aa", "anti-aimbot angles", "\aC8C8C8FFTotal killed: 0"),
+			},
+			["other"] = {
+				label = ui.new_label("aa", "anti-aimbot angles", "\aC8C8C8FFenderphobia"),
+				separator = ui.new_label("aa", "anti-aimbot angles", "\aC8C8C8FF---------------"),
+				export = ui.new_button("aa", "anti-aimbot angles", "\a89f596FFExport state", function()
+					local tbl = {}
+					for i, v in next, aa do
+						tbl[i] = {}
+						for index, value in next, v do
+							tbl[i][index] = {}
+							for ii, vv in next, value do
+								if ii == "type" then
+									tbl[i][index][ii] = ui.get(vv)
+								else
+									if ii ~= "button" then
+										tbl[i][index][ii] = {}
+										for iii, vvv in next, vv do
+											tbl[i][index][ii][iii] = ui.get(vvv)
+										end
+									end
+								end
+							end
+						end
+					end
+					tbl["extra"] = {}
+					for i, v in next, menu["anti aimbot"] do
+						if i == "submenu" then
+							tbl["extra"][i] = ui.get(v)
+						else
+							tbl["extra"][i] = {}
+							for index, value in next, v do
+								local fixer = true
+								if i == "keybinds" then
+									if index == "left" or index == "right" or index == "forward" or index == "backward" or index == "edge" or index == "freestand" then
+										fixer = false
+									end
+								end
+								if fixer then
+									tbl["extra"][i][index] = ui.get(value)
+								end
+							end
+						end
+					end
+					push_notify("Exported config!")
+					clipboard.export(json.stringify({["cidesense"] = tbl}))
+					database.write("cidesense_stats_total_loads", stats.total_loads)
+					database.write("cidesense_stats_total_killed", stats.total_killed)
+				end),
+				import = ui.new_button("aa", "anti-aimbot angles", "\a32a852FFImport state", function()
+					local check, message = pcall(function()
+						local tbl = json.parse(clipboard.import())
+						for i, v in next, tbl["cidesense"]["extra"] do
+							if i == "submenu" then
+								ui.set(menu["anti aimbot"][i], v)
+							else
+								for index, value in next, v do
+									ui.set(menu["anti aimbot"][i][index], value)
+								end
+							end
+						end
+						tbl["cidesense"]["extra"] = nil
+						for i, v in next, tbl["cidesense"] do
+							for index, value in next, v do
+								for ii, vv in next, value do
+									if ii == "type" then
+										ui.set(aa[i][index][ii], vv)
+									else
+										for iii, vvv in next, vv do
+											ui.set(aa[i][index][ii][iii], vvv)
+										end
+									end
+								end
+							end
+						end
+					end)
+					stats.total_loads = stats.total_loads + 1
+					push_notify(check and "Imported config!" or "Error while importing!")
+					database.write("cidesense_stats_total_loads", stats.total_loads)
+					database.write("cidesense_stats_total_killed", stats.total_killed)
+				end),
+			},
+		["visuals & misc"] = {
+			submenu = ui.new_combobox("aa", "anti-aimbot angles", "\nvisuals & misc", {"visuals", "misc"}),
+			["visuals"] = {
+				watermark = ui.new_combobox("aa", "anti-aimbot angles", prefix("always on", "watermark"), {"bottom", "right", "left"}),
+				watermark_color = ui.new_color_picker("aa", "anti-aimbot angles", "\nwatermark", 150, 200, 69, 255),
+				watermark_spaces = ui.new_combobox("aa", "anti-aimbot angles", prefix("remove spaces"), {"yes", "no"}),
+				notify = ui.new_multiselect("aa", "anti-aimbot angles", prefix("notify"), {"hit", "miss", "shot", "reset", "old"}),
+				arrows = ui.new_combobox("aa", "anti-aimbot angles", prefix("arrows"), {"-", "simple", "body", "cidesense"}),
+				arrows_color = ui.new_color_picker("aa", "anti-aimbot angles", "\narrows", 137, 245, 150, 255),
+				indicators = ui.new_combobox("aa", "anti-aimbot angles", prefix("indicators"), {"-", "default"}),
+				indicators_color = ui.new_color_picker("aa", "anti-aimbot angles", "\nindicators", 137, 245, 150, 255),
+			},
+			["misc"] = {
+				features = ui.new_multiselect("aa", "anti-aimbot angles", prefix("features"), {"fix hideshot", "animations", "legs spammer"}),
+				spammer = ui.new_slider("aa", "anti-aimbot angles", "\nspammer", 1, 9, 1),
+				autobuy = ui.new_combobox("aa", "anti-aimbot angles", prefix("auto buy"), {"off", "awp", "scout"})
+			}
+		}
+	}
     for i, v in next, tbl.states do
         aa[v] = {}
         for index, value in next, {"ct", "t"} do
@@ -1042,60 +1070,71 @@ return (function(tbl)
                     end
                 end
             end
-            for i, v in next, menu do
-                for index, value in next, v do
-                    if i == "anti aimbot" and index ~= "submenu" then
-                        for ii, vv in next, value do
-                            fix = true
-                            if index == "features" then
-                                if ii == "distance" then
-                                    fix = ui.get(value["backstab"]) ~= "off"
-                                end
-                                if ii == "fix" then
-                                    fix = ui.get(value["legit"]) ~= "off"
-                                end
+			for i, v in next, menu do
+				for index, value in next, v do
+					if i == "anti aimbot" and index ~= "submenu" then
+						for ii, vv in next, value do
+							fix = true
+							if index == "features" then
+								if ii == "distance" then
+									fix = ui.get(value["backstab"]) ~= "off"
+								end
+								if ii == "fix" then
+									fix = ui.get(value["legit"]) ~= "off"
+								end
 								if ii == "fixer" or ii == "states" then
 									fix = ui.get(value["defensive"]) ~= "off"
 								end
-                            end
-                            if index == "keybinds" then
-                                if ii == "edge" then
-                                    fix = tbl.contains(ui.get(value["keys"]), ii)
-                                end
-                                if ii == "freestand" or ii == "type_freestand" or ii == "disablers" then
-                                    fix = tbl.contains(ui.get(value["keys"]), "freestand")
-                                end
-                                if ii == "left" or ii == "right" or ii == "forward" or ii == "backward" or ii == "type_manual" then
-                                    fix = tbl.contains(ui.get(value["keys"]), "manual")
-                                end
-                            end
-                            ui.set_visible(vv, i == current and index == sub and fix)
-                        end
-                    elseif i == "visuals & misc" and index ~= "submenu" then
-                        for ii, vv in next, value do
-                            fix = true
-                            if index == "misc" then
-                                if ii == "spammer" then
-                                    fix = tbl.contains(ui.get(value["features"]), "legs spammer")
-                                end
-                            end
-                            if index == "visuals" then
-                                if ii == "arrows_color" then
-                                    fix = ui.get(value["arrows"]) ~= "-"
-                                end
-                            end
-                            if index == "visuals" then
-                                if ii == "indicators_color" then
-                                    fix = ui.get(value["indicators"]) ~= "-"
-                                end
-                            end
-                            ui.set_visible(vv, i == current and index == subextra and fix)
-                        end
-                    else
-                        ui.set_visible(value, i == current)
-                    end
-                end
-            end
+							end
+							
+							if index == "statistics" then
+								ui.set(menu["anti aimbot"]["statistics"]["total_loads_label"], "\aC8C8C8FFTotal loads: " .. stats.total_loads)
+								ui.set(menu["anti aimbot"]["statistics"]["total_killed_label"], "\aC8C8C8FFTotal killed: " .. stats.total_killed)
+								fix = true
+							end
+							
+							if index == "keybinds" then
+								if ii == "edge" then
+									fix = tbl.contains(ui.get(value["keys"]), ii)
+								end
+								if ii == "freestand" or ii == "type_freestand" or ii == "disablers" then
+									fix = tbl.contains(ui.get(value["keys"]), "freestand")
+								end
+								if ii == "left" or ii == "right" or ii == "forward" or ii == "backward" or ii == "type_manual" then
+									fix = tbl.contains(ui.get(value["keys"]), "manual")
+								end
+							end
+							-- Добавляем видимость для новых разделов
+							if index == "statistics" or index == "other" then
+								fix = true -- Все элементы в этих разделах всегда видны
+							end
+							ui.set_visible(vv, i == current and index == sub and fix)
+						end
+					elseif i == "visuals & misc" and index ~= "submenu" then
+						for ii, vv in next, value do
+							fix = true
+							if index == "misc" then
+								if ii == "spammer" then
+									fix = tbl.contains(ui.get(value["features"]), "legs spammer")
+								end
+							end
+							if index == "visuals" then
+								if ii == "arrows_color" then
+									fix = ui.get(value["arrows"]) ~= "-"
+								end
+							end
+							if index == "visuals" then
+								if ii == "indicators_color" then
+									fix = ui.get(value["indicators"]) ~= "-"
+								end
+							end
+							ui.set_visible(vv, i == current and index == subextra and fix)
+						end
+					else
+						ui.set_visible(value, i == current)
+					end
+				end
+			end
 		end,
         ["animations"] = function()
 			local myself = entity.get_local_player()
