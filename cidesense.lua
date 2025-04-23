@@ -1127,7 +1127,7 @@ return (function(tbl)
                     end
                     output = output .. ('\a%02x%02x%02x%02x%s'):format(r1, g1, b1, 255, text_to_draw:sub(idx, idx))
                 end
-                output = "L U A" .. output
+                output = "C I D E" .. output
                 if ui.get(menu["visuals & misc"]["visuals"]["watermark_spaces"]) == "yes" then
                     output = output:gsub(" ", "")
                 end
