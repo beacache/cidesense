@@ -41,7 +41,7 @@ return (function(tbl)
         fs = tbl.ref("aa", "anti-aimbot angles", "freestanding")
     }
     local prefix = function(x, z) 
-        return (z and ("\a32a852FFluasense \a698a6dFF~ \a414141FF(\ab5b5b5FF%s\a414141FF) \a89f596FF%s"):format(x, z) or ("\a32a852FFluasense \a698a6dFF~ \a89f596FF%s"):format(x)) 
+        return (z and ("\a32a852FFcidesense \a698a6dFF~ \a414141FF(\ab5b5b5FF%s\a414141FF) \a89f596FF%s"):format(x, z) or ("\a32a852FFcidesense \a698a6dFF~ \a89f596FF%s"):format(x)) 
     end
     local ffi = require("ffi")
     local clipboard = {
@@ -197,10 +197,10 @@ return (function(tbl)
                 disablers = ui.new_multiselect("aa", "anti-aimbot angles", prefix("fs disablers"), {"air", "slow", "duck", "edge", "manual", "fake lag"})
             },
             ["features"] = {
-                legit = ui.new_combobox("aa", "anti-aimbot angles", prefix("legit"), {"off", "default", "luasense"}),
+                legit = ui.new_combobox("aa", "anti-aimbot angles", prefix("legit"), {"off", "default", "cidesense"}),
                 fix = ui.new_multiselect("aa", "anti-aimbot angles", "\nfix", {"generic", "bombsite"}),
 				defensive = ui.new_combobox("aa", "anti-aimbot angles", prefix("defensive"), {"off", "pitch", "spin", "random", "random pitch", "sideways down", "sideways up"}),
-                fixer = ui.new_combobox("aa", "anti-aimbot angles", "\nfixer", {"default", "luasense"}),
+                fixer = ui.new_combobox("aa", "anti-aimbot angles", "\nfixer", {"default", "cidesense"}),
 				states = ui.new_multiselect("aa", "anti-aimbot angles", "\nstates\n", {"standing", "moving", "air", "air duck", "duck", "duck moving", "slow motion"}),
                 backstab = ui.new_combobox("aa", "anti-aimbot angles", prefix("backstab"), {"off", "forward", "random"}),
                 distance = ui.new_slider("aa", "anti-aimbot angles", "\nbackstab", 100, 500, 250),
@@ -214,7 +214,7 @@ return (function(tbl)
                 watermark_color = ui.new_color_picker("aa", "anti-aimbot angles", "\nwatermark", 150, 200, 69, 255),
                 watermark_spaces = ui.new_combobox("aa", "anti-aimbot angles", prefix("remove spaces"), {"yes", "no"}),
                 notify = ui.new_multiselect("aa", "anti-aimbot angles", prefix("notify"), {"hit", "miss", "shot", "reset", "old"}),
-                arrows = ui.new_combobox("aa", "anti-aimbot angles", prefix("arrows"), {"-", "simple", "body", "luasense"}),
+                arrows = ui.new_combobox("aa", "anti-aimbot angles", prefix("arrows"), {"-", "simple", "body", "cidesense"}),
                 arrows_color = ui.new_color_picker("aa", "anti-aimbot angles", "\narrows", 137, 245, 150, 255),
                 indicators = ui.new_combobox("aa", "anti-aimbot angles", prefix("indicators"), {"-", "default"}),
                 indicators_color = ui.new_color_picker("aa", "anti-aimbot angles", "\nindicators", 137, 245, 150, 255),
@@ -266,12 +266,12 @@ return (function(tbl)
                     end
                 end
 				push_notify("Exported config!")
-                clipboard.export(json.stringify({["LUASENSE"] = tbl}))
+                clipboard.export(json.stringify({["cidesense"] = tbl}))
             end),
             import = ui.new_button("aa", "anti-aimbot angles", "\a32a852FF import", function()
                 local check, message = pcall(function()
                     local tbl = json.parse(clipboard.import())
-                    for i, v in next, tbl["LUASENSE"]["extra"] do
+                    for i, v in next, tbl["cidesense"]["extra"] do
                         if i == "submenu" then
                             ui.set(menu["anti aimbot"][i], v)
                         else
@@ -280,8 +280,8 @@ return (function(tbl)
                             end
                         end
                     end
-                    tbl["LUASENSE"]["extra"] = nil
-                    for i, v in next, tbl["LUASENSE"] do
+                    tbl["cidesense"]["extra"] = nil
+                    for i, v in next, tbl["cidesense"] do
                         for index, value in next, v do
                             for ii, vv in next, value do
                                 if ii == "type" then
@@ -303,43 +303,43 @@ return (function(tbl)
         aa[v] = {}
         for index, value in next, {"ct", "t"} do
             aa[v][value] = {
-                ["type"] = ui.new_combobox("aa", "anti-aimbot angles", prefix(v .. " " .. value, "type"), (v == "global" and {"normal", "luasense", "advanced", "auto"} or {"disabled", "normal", "luasense", "advanced", "auto"})),
+                ["type"] = ui.new_combobox("aa", "anti-aimbot angles", prefix(v .. " " .. value, "type"), (v == "global" and {"normal", "cidesense", "advanced", "auto"} or {"disabled", "normal", "cidesense", "advanced", "auto"})),
                 ["normal"] = {
                     mode = ui.new_multiselect("aa", "anti-aimbot angles", prefix(v .. " " .. value, "mode"), {"yaw", "left right"}),
                     yaw = ui.new_slider("aa", "anti-aimbot angles", prefix(v .. " " .. value, "yaw"), -180, 180, 0),
                     left = ui.new_slider("aa", "anti-aimbot angles", prefix(v .. " " .. value, "left"), -180, 180, 0),
                     right = ui.new_slider("aa", "anti-aimbot angles", prefix(v .. " " .. value, "right"), -180, 180, 0),
-                    method = ui.new_combobox("aa", "anti-aimbot angles", prefix(v .. " " .. value, "method"), {"default", "luasense"}),
+                    method = ui.new_combobox("aa", "anti-aimbot angles", prefix(v .. " " .. value, "method"), {"default", "cidesense"}),
                     jitter = ui.new_combobox("aa", "anti-aimbot angles", prefix(v .. " " .. value, "jitter"), {"off", "offset", "center", "random", "skitter"}),
                     jitter_slider = ui.new_slider("aa", "anti-aimbot angles", "\njitter slider " .. v .. " " .. value, -180, 180, 0),
-                    body = ui.new_combobox("aa", "anti-aimbot angles", prefix(v .. " " .. value, "body"), {"off", "luasense", "opposite", "static", "jitter"}),
+                    body = ui.new_combobox("aa", "anti-aimbot angles", prefix(v .. " " .. value, "body"), {"off", "cidesense", "opposite", "static", "jitter"}),
                     body_slider = ui.new_slider("aa", "anti-aimbot angles", "\nbody slider " .. v .. " " .. value, -180, 180, 0),
                     custom_slider = ui.new_slider("aa", "anti-aimbot angles", "\ncustom slider " .. v .. " " .. value, 0, 60, 60),
-                    defensive = ui.new_combobox("aa", "anti-aimbot angles", prefix(v .. " " .. value, "defensive"), {"off", "always on", "luasense"})
+                    defensive = ui.new_combobox("aa", "anti-aimbot angles", prefix(v .. " " .. value, "defensive"), {"off", "always on", "cidesense"})
                 },
-                ["luasense"] = {
-                    luasense = ui.new_slider("aa", "anti-aimbot angles", prefix(v .. " " .. value, "luasense"), 1, 10, 1),
+                ["cidesense"] = {
+                    cidesense = ui.new_slider("aa", "anti-aimbot angles", prefix(v .. " " .. value, "cidesense"), 1, 10, 1),
                     mode = ui.new_multiselect("aa", "anti-aimbot angles", prefix(v .. " " .. value, "mode\n"), {"yaw", "left right"}),
                     yaw = ui.new_slider("aa", "anti-aimbot angles", prefix(v .. " " .. value, "yaw\n"), -180, 180, 0),
                     left = ui.new_slider("aa", "anti-aimbot angles", prefix(v .. " " .. value, "left\n"), -180, 180, 0),
                     right = ui.new_slider("aa", "anti-aimbot angles", prefix(v .. " " .. value, "right\n"), -180, 180, 0),
                     fake = ui.new_slider("aa", "anti-aimbot angles", prefix(v .. " " .. value, "fake"), 0, 60, 60),
-                    defensive = ui.new_combobox("aa", "anti-aimbot angles", prefix(v .. " " .. value, "defensive\n"), {"off", "always on", "luasense"})
+                    defensive = ui.new_combobox("aa", "anti-aimbot angles", prefix(v .. " " .. value, "defensive\n"), {"off", "always on", "cidesense"})
                 },
 				["advanced"] = {
 					--trigger = tbl.item("new_combobox", {rgba(69,169,55,255,v .. ": ") .. rgba(69,169,155,255,"Trigger"), "A: Brandon", "B: Best", "C: Experimental", "Automatic"}),
 					trigger = ui.new_combobox("aa", "anti-aimbot angles", prefix(v .. " " .. value, "trigger"), "a: brandon", "b: best", "c: experimental", "automatic"),
 					left = ui.new_slider("aa", "anti-aimbot angles", prefix(v .. " " .. value, "left\n\n"), -180, 180, 0),
                     right = ui.new_slider("aa", "anti-aimbot angles", prefix(v .. " " .. value, "right\n\n"), -180, 180, 0),
-					defensive = ui.new_combobox("aa", "anti-aimbot angles", prefix(v .. " " .. value, "defensive\n\n\n"), {"off", "always on", "luasense"})
+					defensive = ui.new_combobox("aa", "anti-aimbot angles", prefix(v .. " " .. value, "defensive\n\n\n"), {"off", "always on", "cidesense"})
 				},
                 ["auto"] = {
-                    method = ui.new_combobox("aa", "anti-aimbot angles", prefix(v .. " " .. value, "method\n"), {"simple", "luasense"}),
+                    method = ui.new_combobox("aa", "anti-aimbot angles", prefix(v .. " " .. value, "method\n"), {"simple", "cidesense"}),
                     timer = ui.new_slider("aa", "anti-aimbot angles", "\ntimer", 50, 250, 150),
 					left = ui.new_slider("aa", "anti-aimbot angles", prefix(v .. " " .. value, "left\n\n\n"), -180, 180, 0),
                     right = ui.new_slider("aa", "anti-aimbot angles", prefix(v .. " " .. value, "right\n\n\n"), -180, 180, 0),
                     antibf = ui.new_combobox("aa", "anti-aimbot angles", prefix(v .. " " .. value, "bruteforce"), {"no", "yes"}),
-                    defensive = ui.new_combobox("aa", "anti-aimbot angles", prefix(v .. " " .. value, "defensive\n\n"), {"off", "always on", "luasense"})
+                    defensive = ui.new_combobox("aa", "anti-aimbot angles", prefix(v .. " " .. value, "defensive\n\n"), {"off", "always on", "cidesense"})
                 },
                 ["disabled"] = {},
                 ["button"] = ui.new_button("aa", "anti-aimbot angles", "\a32a852FFsend to \a89f596FF" .. (value == "t" and "ct" or "t"), function()
@@ -367,7 +367,7 @@ return (function(tbl)
         dt = tbl.ref("rage", "aimbot", "double tap")
     }
     tbl.antiaim = {
-        luasensefake = false,
+        cidesensefake = false,
         autocheck = false,
         current = false,
         active = false,
@@ -691,10 +691,10 @@ return (function(tbl)
                 end
                 if tbl.contains(ui.get(menutbl["mode"]), "left right") then
                     local method = arg.chokedcommands == 0
-                    if ui.get(menutbl["method"]) == "luasense" then
+                    if ui.get(menutbl["method"]) == "cidesense" then
                         method = arg.chokedcommands ~= 0
                     end
-                    if method and ui.get(menutbl["body"]) ~= "luasense" then
+                    if method and ui.get(menutbl["body"]) ~= "cidesense" then
                         if math.max(-60, math.min(60, math.floor((entity.get_prop(myself,"m_flPoseParameter", 11) or 0)*120-60+0.5))) > 0 then
                             ui.set(tbl.items.yaw[2], tbl.clamp(yaw + ui.get(menutbl["right"])))
                         else
@@ -706,25 +706,25 @@ return (function(tbl)
                 end
                 ui.set(tbl.items.jitter[1], ui.get(menutbl["jitter"]))
                 ui.set(tbl.items.jitter[2], ui.get(menutbl["jitter_slider"]))
-                if ui.get(menutbl["body"]) ~= "luasense" then
+                if ui.get(menutbl["body"]) ~= "cidesense" then
                     ui.set(tbl.items.body[1], ui.get(menutbl["body"]))
                     ui.set(tbl.items.body[2], ui.get(menutbl["body_slider"]))
                 else
                     ui.set(tbl.items.body[1], "static")
                     local fake = (ui.get(menutbl["custom_slider"])+1) * 2
-                    local luasensefake = false
+                    local cidesensefake = false
                     if arg.command_number % client.random_int(3,6) == 1 then
 						tbl.antiaim.ready = true
                     end
 					if tbl.antiaim.ready and arg.chokedcommands == 0 then
 						tbl.antiaim.ready = false
-						tbl.antiaim.luasensefake = not tbl.antiaim.luasensefake
-                        ui.set(tbl.items.body[2], tbl.antiaim.luasensefake and -fake or fake)
-                        luasensefake = true
+						tbl.antiaim.cidesensefake = not tbl.antiaim.cidesensefake
+                        ui.set(tbl.items.body[2], tbl.antiaim.cidesensefake and -fake or fake)
+                        cidesensefake = true
 					end
                     if tbl.contains(ui.get(menutbl["mode"]), "left right") then
-                        if luasensefake then
-                            if tbl.antiaim.luasensefake then
+                        if cidesensefake then
+                            if tbl.antiaim.cidesensefake then
                                 ui.set(tbl.items.yaw[2], tbl.clamp(yaw + ui.get(menutbl["right"])))
                             else
                                 ui.set(tbl.items.yaw[2], tbl.clamp(yaw + ui.get(menutbl["left"])))
@@ -732,29 +732,29 @@ return (function(tbl)
                         end
                     end
                 end
-                if ui.get(menutbl["defensive"]) == "luasense" then
+                if ui.get(menutbl["defensive"]) == "cidesense" then
                     arg.force_defensive = arg.command_number % 3 ~= 1 or arg.weaponselect ~= 0 or arg.quick_stop == 1
                 elseif ui.get(menutbl["defensive"]) == "always on" then
                     arg.force_defensive = true
                 else end
-            elseif ui.get(menutbl["type"]) == "luasense" then
+            elseif ui.get(menutbl["type"]) == "cidesense" then
                 menutbl = menutbl[ui.get(menutbl["type"])]
                 ui.set(tbl.items.jitter[1], "off")
                 ui.set(tbl.items.body[1], "static")
-                if arg.command_number % (ui.get(menutbl["luasense"])+1+1) == 1 then
+                if arg.command_number % (ui.get(menutbl["cidesense"])+1+1) == 1 then
 					tbl.antiaim.ready = true
                 end
 				if tbl.antiaim.ready and arg.chokedcommands == 0 then
 					local fake = (ui.get(menutbl["fake"])+1) * 2
 					tbl.antiaim.ready = false
-                    tbl.antiaim.luasensefake = not tbl.antiaim.luasensefake
-                    ui.set(tbl.items.body[2], tbl.antiaim.luasensefake and -fake or fake)
+                    tbl.antiaim.cidesensefake = not tbl.antiaim.cidesensefake
+                    ui.set(tbl.items.body[2], tbl.antiaim.cidesensefake and -fake or fake)
                     local yaw = tbl.antiaim.manual.aa
                     if tbl.contains(ui.get(menutbl["mode"]), "yaw") then
                         yaw = tbl.antiaim.manual.aa + ui.get(menutbl["yaw"])
                     end
                     if tbl.contains(ui.get(menutbl["mode"]), "left right") then
-                        if tbl.antiaim.luasensefake then
+                        if tbl.antiaim.cidesensefake then
                             ui.set(tbl.items.yaw[2], tbl.clamp(yaw + ui.get(menutbl["right"])))
                         else
                             ui.set(tbl.items.yaw[2], tbl.clamp(yaw + ui.get(menutbl["left"])))
@@ -763,7 +763,7 @@ return (function(tbl)
                         ui.set(tbl.items.yaw[2], tbl.clamp(yaw))
                     end
 				end
-                if ui.get(menutbl["defensive"]) == "luasense" then
+                if ui.get(menutbl["defensive"]) == "cidesense" then
                     arg.force_defensive = arg.command_number % 3 ~= 1 or arg.weaponselect ~= 0 or arg.quick_stop == 1
                 elseif ui.get(menutbl["defensive"]) == "always on" then
                     arg.force_defensive = true
@@ -796,7 +796,7 @@ return (function(tbl)
 						ui.set(tbl.items.yaw[2], tbl.clamp(ui.get(menutbl["left"]) + tbl.antiaim.manual.aa))
 					end
 				end
-                if ui.get(menutbl["defensive"]) == "luasense" then
+                if ui.get(menutbl["defensive"]) == "cidesense" then
                     arg.force_defensive = arg.command_number % 3 ~= 1 or arg.weaponselect ~= 0 or arg.quick_stop == 1
                 elseif ui.get(menutbl["defensive"]) == "always on" then
                     arg.force_defensive = true
@@ -818,7 +818,7 @@ return (function(tbl)
                     tbl.antiaim.current = check
                     tbl.antiaim.active = true
                 end
-                if ui.get(menutbl["method"]) == "luasense" then
+                if ui.get(menutbl["method"]) == "cidesense" then
                     if tbl.antiaim.count then
                         if tbl.antiaim.timer > ui.get(menutbl["timer"]) then
                             tbl.antiaim.timer = 0
@@ -834,11 +834,11 @@ return (function(tbl)
 						end
 						if tbl.antiaim.ready and arg.chokedcommands == 0 then
 							tbl.antiaim.ready = false
-							tbl.antiaim.luasensefake = not tbl.antiaim.luasensefake
+							tbl.antiaim.cidesensefake = not tbl.antiaim.cidesensefake
 						end
 						local yaw = tbl.antiaim.manual.aa
-						check = tbl.antiaim.luasensefake
-						if tbl.antiaim.luasensefake then
+						check = tbl.antiaim.cidesensefake
+						if tbl.antiaim.cidesensefake then
 							ui.set(tbl.items.yaw[2], tbl.clamp(yaw + ui.get(menutbl["right"])))
 						else
 							ui.set(tbl.items.yaw[2], tbl.clamp(yaw + ui.get(menutbl["left"])))
@@ -854,7 +854,7 @@ return (function(tbl)
                 end
                 ui.set(tbl.items.jitter[2], check and -3 or 3)
                 ui.set(tbl.items.body[2], check and -123 or 123)
-                if ui.get(menutbl["defensive"]) == "luasense" then
+                if ui.get(menutbl["defensive"]) == "cidesense" then
                     arg.force_defensive = arg.command_number % 3 ~= 1 or arg.weaponselect ~= 0 or arg.quick_stop == 1
                 elseif ui.get(menutbl["defensive"]) == "always on" then
                     arg.force_defensive = true
@@ -933,7 +933,7 @@ return (function(tbl)
 				end
 			end
 			tbl.list_aa[tbl.tick_aa]["check"] = tbl.normal_aa
-			if tbl.normal_aa and tbl.reset_aa and ui.get(menu["anti aimbot"]["features"]["fixer"]) == "luasense" then
+			if tbl.normal_aa and tbl.reset_aa and ui.get(menu["anti aimbot"]["features"]["fixer"]) == "cidesense" then
 				tbl.reset_aa = false
 				for i = 1, 69 do
 					if tbl.list_aa[tbl.tick_aa-i] then
@@ -1009,10 +1009,10 @@ return (function(tbl)
                                         fix = ui.get(vv["jitter"]) ~= "off"
                                     end
                                     if iii == "body_slider" then
-                                        fix = ui.get(vv["body"]) ~= "off" and ui.get(vv["body"]) ~= "opposite" and ui.get(vv["body"]) ~= "luasense"
+                                        fix = ui.get(vv["body"]) ~= "off" and ui.get(vv["body"]) ~= "opposite" and ui.get(vv["body"]) ~= "cidesense"
                                     end
                                     if iii == "custom_slider" then
-                                        fix = ui.get(vv["body"]) == "luasense"
+                                        fix = ui.get(vv["body"]) == "cidesense"
                                     end
                                     if iii == "yaw" then
                                         fix = tbl.contains(ui.get(vv["mode"]), iii)
@@ -1021,7 +1021,7 @@ return (function(tbl)
                                         fix = tbl.contains(ui.get(vv["mode"]), "left right")
                                     end
                                 end
-                                if ii == "luasense" then
+                                if ii == "cidesense" then
                                     if iii == "yaw" then
                                         fix = tbl.contains(ui.get(vv["mode"]), iii)
                                     end
@@ -1031,7 +1031,7 @@ return (function(tbl)
                                 end
                                 if ii == "auto" then
                                     if iii == "timer" or iii == "left" or iii == "right" then
-                                        fix = ui.get(vv["method"]) == "luasense"
+                                        fix = ui.get(vv["method"]) == "cidesense"
                                     end
                                 end
                                 ui.set_visible(vvv, section and selected and current == "anti aimbot" and sub == "builder" and mode == ii and fix)
@@ -1172,7 +1172,7 @@ return (function(tbl)
                     if tbl.antiaim.manual.aa == -90 then
                         renderer.text(w - 50, h, r,g,b, alpha, "c+", 0, leftkey)
                     end
-                elseif ui.get(menu["visuals & misc"]["visuals"]["arrows"]) == "luasense" then
+                elseif ui.get(menu["visuals & misc"]["visuals"]["arrows"]) == "cidesense" then
                     local xv, yv, zv = entity.get_prop(myself, "m_vecVelocity")
                     local speed = math.sqrt(xv*xv + yv*yv + zv*zv)/10
                     if tbl.antiaim.fs == 1 then
@@ -1221,9 +1221,9 @@ return (function(tbl)
 				local r1, g1, b1, a1 = r,g,b, 255
 				local r2, g2, b2, a2 = 155, 155, 155, 255
 				if yaw_body > 0 then
-					renderer.text( w, h + ind_height, 255, 255, 255, 255, "cb", nil, gradient(r2, g2, b2, a2, r1, g1, b1, a1, "luasense") )
+					renderer.text( w, h + ind_height, 255, 255, 255, 255, "cb", nil, gradient(r2, g2, b2, a2, r1, g1, b1, a1, "cidesense") )
 				else
-					renderer.text( w, h + ind_height, 255, 255, 255, 255, "cb", nil, gradient(r1, g1, b1, a1, r2, g2, b2, a2, "luasense") )
+					renderer.text( w, h + ind_height, 255, 255, 255, 255, "cb", nil, gradient(r1, g1, b1, a1, r2, g2, b2, a2, "cidesense") )
 				end
 				local dt_on = (ui.get(z.items.keys.dt[1]) and ui.get(z.items.keys.dt[2]))
 				local hs_on = (ui.get(z.items.keys.hs[1]) and ui.get(z.items.keys.hs[2]))
